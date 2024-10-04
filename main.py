@@ -23,7 +23,6 @@ with st.expander('Uploaded Files'):
         'Partner Program Register (PPR) - GART.csv': None,
     }
 
-
     uploaded_files = st.file_uploader(
         label='Files (' + str(len(files)) + ')',
         accept_multiple_files=True
@@ -48,7 +47,6 @@ if len(uploaded_files) > 0:
 if len(uploaded_files) > 0 and not hasAllRequiredFiles:
     for item in missing:
         st.warning('**' + item + '** is missing and required.')
-
 
 elif len(uploaded_files) > 0 and hasAllRequiredFiles:
     oc = pd.read_csv(uploaded_files[files['Import1.csv']], low_memory=False)
@@ -75,7 +73,6 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
     def add_service_to_results(service, date, agreement):
         results.append([service, '', date, agreement])
 
-
     def get_services(row):
         is_on_bike_program = not pd.isna(row.Bike)
         is_on_gart_program = not pd.isna(row.Gart)
@@ -100,5 +97,5 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
     deliverable.Date = pd.to_datetime(deliverable.Date)
     deliverable = deliverable.sort_values(by='Date')
     deliverable.Date = deliverable.Date.dt.strftime('%m/%d/%Y')
-    
-    deliverable
+
+    st.dataframe(deliverable, use_container_width=True, hide_index=True)
