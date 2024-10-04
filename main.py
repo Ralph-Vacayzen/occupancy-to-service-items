@@ -65,4 +65,6 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
 
     df = pd.merge(oc, bp, how='left')
     df = pd.merge(df, gp, how='left')
+
+    df = df[~pd.isna(df.Bike) | ~pd.isna(df.Gart)]
     df
