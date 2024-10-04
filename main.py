@@ -67,4 +67,38 @@ elif len(uploaded_files) > 0 and hasAllRequiredFiles:
     df = pd.merge(df, gp, how='left')
 
     df = df[~pd.isna(df.Bike) | ~pd.isna(df.Gart)]
-    df
+    df = df.drop_duplicates()
+
+    header  = ['Service Item','Line Note','Date','Rental Agreement']
+    results = []
+
+    def add_service_to_results(service, date, agreement):
+        results.append([service, '', date, agreement])
+
+
+    def get_services(row):
+        is_on_bike_program = not pd.isna(row.Bike)
+        is_on_gart_program = not pd.isna(row.Gart)
+    
+
+        if 'TP' in row.Unit and is_on_bike_program:
+            add_service_to_results(service='The Pointe Arrival',   date=row.Arrival,   agreement=row.Bike)
+            add_service_to_results(service='The Pointe Departure', date=row.Departure, agreement=row.Bike)
+            return
+
+        if row.Type == 'Guest of Owner' or row.Type == 'Owner':
+            if is_on_bike_program: add_service_to_results(service='Bike Check - Owner Arrival', date=row.Arrival, agreement=row.Bike)
+            if is_on_gart_program: add_service_to_results(service='Gart Check - Owner Arrival', date=row.Arrival, agreement=row.Gart)
+            
+            
+        if is_on_bike_program: add_service_to_results(service='Bike Check', date=row.Departure, agreement=row.Bike)
+        if is_on_gart_program: add_service_to_results(service='Gart Check', date=row.Departure, agreement=row.Gart)
+    
+    df.apply(get_services, axis=1)
+
+    deliverable = pd.DataFrame(results, columns=header)
+    deliverable.Date = pd.to_datetime(deliverable.Date)
+    deliverable = deliverable.sort_values(by='Date')
+    deliverable.Date = deliverable.Date.dt.strftime('%m/%d/%Y')
+    
+    deliverable
